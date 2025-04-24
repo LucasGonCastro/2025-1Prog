@@ -1,2 +1,2 @@
-# 2025-1Prog
-Disciplina De Prog
+#2025
+Inicializacao de Programacao de Computadores
