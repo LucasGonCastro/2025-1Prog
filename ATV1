@@ -1,0 +1,22 @@
+import random
+
+num_linhas = int(input("Digite a quantidade de linhas (sublistas): "))
+num_colunas = int(input("Digite a quantidade de colunas (elementos por sublista): "))
+
+matriz = [
+    [random.randint(1, 100) for _ in range(num_colunas)]
+    for _ in range(num_linhas)
+]
+
+print("Matriz original:")
+for linha in matriz:
+    print(linha)
+
+transposta = [
+    [matriz[linha][coluna] for linha in range(num_linhas)]
+    for coluna in range(num_colunas)
+]
+
+print("Matriz transposta:")
+for linha in transposta:
+    print(linha)
