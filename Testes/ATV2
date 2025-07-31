@@ -1,0 +1,55 @@
+import random
+
+while True:
+    n_str = input("Digite a quantidade de números (entre 7 e 60): ")
+    if n_str.isdigit():
+        n = int(n_str)
+        if 7 <= n <= 60:
+            break
+    print("Valor inválido. Digite um número entre 7 e 60.")
+
+numeros_escolhidos = []
+while len(numeros_escolhidos) < n:
+    num = random.randint(1, 60)
+    if num not in numeros_escolhidos:
+        numeros_escolhidos.append(num)
+numeros_escolhidos.sort()
+
+todas_combinacoes = []
+indices = list(range(6))
+while True:
+    comb = [numeros_escolhidos[i] for i in indices]
+    todas_combinacoes.append(comb)
+    
+    i = 5
+    while i >= 0 and indices[i] == i + (n - 6):
+        i -= 1
+    if i < 0:
+        break  # Todas as combinações foram geradas
+    
+    indices[i] += 1
+    for j in range(i + 1, 6):
+        indices[j] = indices[j - 1] + 1
+
+with open('NUMEROS_ESCOLHIDOS.TXT', 'w') as f:
+    f.write(' '.join(map(str, numeros_escolhidos)))
+
+with open('COMBINACOES.CSV', 'w') as f:
+    for comb in todas_combinacoes:
+        f.write(';'.join(map(str, comb)) + '\n')
+
+fatorial = 1
+fatoriais = [1]  # fatorial[0] = 1
+for i in range(1, n + 1):
+    fatorial *= i
+    fatoriais.append(fatorial)
+
+total_combinacoes = fatoriais[n] // (fatoriais[6] * fatoriais[n - 6])
+prob_sena = 1 / total_combinacoes
+prob_quina = (6 * (n - 6)) / total_combinacoes  # C(6,5) * C(n-6,1)
+prob_quadra = (15 * (n - 6) * (n - 7) // 2) / total_combinacoes  # C(6,4) * C(n-6,2)
+
+print(f"\nTotal de combinações geradas: {total_combinacoes}")
+print(f"Probabilidade de acertar a sena: {prob_sena:.10f} (1 em {total_combinacoes})")
+print(f"Probabilidade de acertar a quina: {prob_quina:.8f}")
+print(f"Probabilidade de acertar a quadra: {prob_quadra:.8f}")
