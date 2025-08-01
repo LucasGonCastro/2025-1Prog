@@ -1,0 +1,95 @@
+import csv
+
+regioes_estados = {
+    'Norte': ['AC', 'AP', 'AM', 'PA', 'RO', 'RR', 'TO'],
+    'Nordeste': ['AL', 'BA', 'CE', 'MA', 'PB', 'PE', 'PI', 'RN', 'SE'],
+    'Centro-Oeste': ['DF', 'GO', 'MT', 'MS'],
+    'Sudeste': ['ES', 'MG', 'RJ', 'SP'],
+    'Sul': ['PR', 'RS', 'SC']
+}
+
+with open('censo_2022_populacao_residente_municipios.csv', mode='r', encoding='utf-8') as file:
+    reader = csv.reader(file, delimiter=';')
+    next(reader)  # Pular cabeçalho
+    dados = [linha for linha in reader if len(linha) >= 4]
+
+dados = [
+    [linha[0], linha[1], linha[2], int(linha[3])] 
+    for linha in dados 
+    if linha[3].isdigit()
+]
+
+while True:
+    print("\nOpções de consulta:")
+    print("1. Consultar por estado")
+    print("2. Consultar por região")
+    print("3. Sair")
+    
+    opcao = input("Escolha uma opção (1-3): ").strip()
+    
+    if opcao == '1':
+        uf = input("Informe a sigla do estado (ex: SP, RJ, MG): ").upper()
+        
+      
+        estados_validos = list(set(municipio[2] for municipio in dados))
+        if uf not in estados_validos:
+            print(f"Estado {uf} não encontrado. Siglas válidas: {', '.join(sorted(estados_validos))}")
+            continue
+        
+      
+        municipios_estado = list(filter(lambda x: x[2] == uf, dados))
+        municipios_estado.sort(key=lambda x: x[3], reverse=True)
+        top_10 = municipios_estado[:10]
+        
+      
+        populacao_total = sum(municipio[3] for municipio in municipios_estado)
+        
+      
+        print(f"\nTOP 10 CIDADES MAIS POPULOSAS DE {uf}:")
+        print("-" * 60)
+        print(f"{'Posição':<8}{'Cidade':<30}{'População':<15}{'% do estado':<15}")
+        print("-" * 60)
+        
+        for i, (nome, _, _, pop) in enumerate(top_10, 1):
+            percentual = (pop / populacao_total) * 100
+            print(f"{i:<8}{nome:<30}{pop:,}<15{percentual:.2f}%".replace(",", "."))
+    
+    elif opcao == '2':
+        regiao = input("Informe a região (Norte, Nordeste, Centro-Oeste, Sudeste, Sul): ").title()
+        
+  
+        if regiao not in regioes_estados:
+            print(f"Região '{regiao}' não encontrada. Regiões válidas: {', '.join(regioes_estados.keys())}")
+            continue
+        
+        estados_regiao = regioes_estados[regiao]
+        
+        print(f"TOP 10 CIDADES MAIS POPULOSAS DE CADA ESTADO DA REGIÃO {regiao.upper()}:")
+        
+        for uf in estados_regiao:
+            # Filtrar e ordenar municípios do estado
+            municipios_estado = list(filter(lambda x: x[2] == uf, dados))
+            
+            if not municipios_estado:
+                continue
+                
+            municipios_estado.sort(key=lambda x: x[3], reverse=True)
+            top_10 = municipios_estado[:10]
+            
+          
+            populacao_total = sum(municipio[3] for municipio in municipios_estado)
+    
+            print(f"\n{uf}:")
+            print("-" * 50)
+            print(f"{'Posição':<8}{'Cidade':<30}{'População':<15}")
+            print("-" * 50)
+            
+            for i, (nome, _, _, pop) in enumerate(top_10, 1):
+                print(f"{i:<8}{nome:<30}{pop:,}".replace(",", "."))
+    
+    elif opcao == '3':
+        print("Encerrando o programa...")
+        break
+    
+    else:
+        print("Opção inválida. Por favor, escolha 1, 2 ou 3.")
