@@ -1,0 +1,88 @@
+import csv
+
+with open('alunos_ifrn.csv', 'r', encoding='utf-8') as arquivo:
+    leitor = csv.DictReader(arquivo, delimiter=';')
+    dados = list(leitor)
+
+total_alunos = len(dados)
+
+# 1. Relatório por campus
+campus_contagem = {}
+for aluno in dados:
+    campus = aluno['campus']
+    if campus in campus_contagem:
+        campus_contagem[campus] += 1
+    else:
+        campus_contagem[campus] = 1
+
+relatorio_campus = []
+for campus, quantidade in campus_contagem.items():
+    percentual = (quantidade / total_alunos) * 100
+    relatorio_campus.append([campus, quantidade, f"{percentual:.2f}%"])
+
+relatorio_campus.sort(key=lambda x: x[1], reverse=True)
+
+with open('ALUNOS_IFRN_CAMPUS.CSV', 'w', newline='', encoding='utf-8') as arquivo:
+    escritor = csv.writer(arquivo, delimiter=';')
+    escritor.writerow(['Campus', 'Quantidade', 'Percentual'])
+    for linha in relatorio_campus:
+        escritor.writerow(linha)
+
+ano_contagem = {}
+for aluno in dados:
+    matricula = aluno['matricula']
+    ano = matricula[:4]  # Pegar os primeiros 4 dígitos da matrícula
+    if ano.isdigit():
+        if ano in ano_contagem:
+            ano_contagem[ano] += 1
+        else:
+            ano_contagem[ano] = 1
+
+relatorio_ano = [[ano, quantidade] for ano, quantidade in ano_contagem.items()]
+
+relatorio_ano.sort(key=lambda x: x[1], reverse=True)
+
+with open('ALUNOS_IFRN_ANO.CSV', 'w', newline='', encoding='utf-8') as arquivo:
+    escritor = csv.writer(arquivo, delimiter=';')
+    escritor.writerow(['Ano', 'Quantidade'])
+    for linha in relatorio_ano:
+        escritor.writerow(linha)
+campi_disponiveis = sorted(campus_contagem.keys())
+print("\nCampi disponíveis:")
+for i, campus in enumerate(campi_disponiveis, 1):
+    print(f"{i}. {campus}")
+
+while True:
+    try:
+        escolha = int(input("\nEscolha o número do campus: ")) - 1
+        if 0 <= escolha < len(campi_disponiveis):
+            campus_escolhido = campi_disponiveis[escolha]
+            break
+        else:
+            print("Número inválido. Tente novamente.")
+    except ValueError:
+        print("Por favor, digite um número válido.")
+
+curso_contagem = {}
+for aluno in dados:
+    if aluno['campus'] == campus_escolhido:
+        curso = aluno['curso']
+        if curso in curso_contagem:
+            curso_contagem[curso] += 1
+        else:
+            curso_contagem[curso] = 1
+
+relatorio_curso = [[curso, quantidade] for curso, quantidade in curso_contagem.items()]
+
+relatorio_curso.sort(key=lambda x: x[1], reverse=True)
+
+with open('ALUNOS_IFRN_CAMPUS_CURSO.CSV', 'w', newline='', encoding='utf-8') as arquivo:
+    escritor = csv.writer(arquivo, delimiter=';')
+    escritor.writerow(['Curso', 'Quantidade'])
+    for linha in relatorio_curso:
+        escritor.writerow(linha)
+
+print("Relatórios gerados com sucesso!")
+print(f"- ALUNOS_IFRN_CAMPUS.CSV: Relatório por campus")
+print(f"- ALUNOS_IFRN_ANO.CSV: Relatório por ano de ingresso")
+print(f"- ALUNOS_IFRN_CAMPUS_CURSO.CSV: Relatório por curso no campus {campus_escolhido}")
