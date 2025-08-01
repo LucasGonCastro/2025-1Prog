@@ -1,0 +1,41 @@
+import random
+
+while True:
+    try:
+        n = int(input("Digite a quantidade de elementos (número positivo): "))
+        if n > 0:
+            break
+        print("O número deve ser positivo!")
+    except ValueError:
+        print("Digite um número inteiro válido!")
+
+lista = [random.randint(0, 99) for _ in range(n)]
+print(f"\nLista gerada: {lista}")
+
+soma = sum(lista)
+media = soma / n
+print(f"Média: {media:.2f}")
+
+lista_ordenada = sorted(lista)
+if n % 2 == 1:
+    mediana = lista_ordenada[n//2]
+else:
+    mediana = (lista_ordenada[n//2 - 1] + lista_ordenada[n//2]) / 2
+print(f"Mediana: {mediana:.2f}")
+
+soma_quadrados = sum((x - media) ** 2 for x in lista)
+variancia = soma_quadrados / n
+print(f"Variância populacional: {variancia:.2f}")
+
+desvio_padrao = variancia ** 0.5
+print(f"Desvio padrão populacional: {desvio_padrao:.2f}")
+
+try:
+    import statistics
+    print("\nVerificação com statistics:")
+    print(f"Média: {statistics.mean(lista):.2f}")
+    print(f"Mediana: {statistics.median(lista):.2f}")
+    print(f"Variância pop.: {statistics.pvariance(lista):.2f}")
+    print(f"Desvio padrão pop.: {statistics.pstdev(lista):.2f}")
+except ImportError:
+    print("[O módulo statistics não está disponível para verificação]")
