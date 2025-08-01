@@ -1,0 +1,49 @@
+import csv
+
+with open('produtos_informatica.csv.csv', mode='r', encoding='utf-8') as file:
+    reader = csv.reader(file, delimiter=';')
+    header = next(reader)  # Pula o cabeçalho
+    produtos = [row for row in reader]
+
+produtos = list(map(lambda p: [
+    p[0], 
+    p[1], 
+    float(p[2]), 
+    float(p[3]), 
+    float(p[4])
+], produtos))
+
+empresa_escolhida = input("Escolha a empresa para aplicar desconto (A, B ou C): ").upper()
+while empresa_escolhida not in ['A', 'B', 'C']:
+    print("Empresa inválida. Digite A, B ou C.")
+    empresa_escolhida = input("Escolha a empresa para aplicar desconto (A, B ou C): ").upper()
+
+desconto = float(input("Digite o percentual de desconto (ex: 10 para 10%): "))
+while desconto < 0 or desconto > 100:
+    print("Desconto inválido. Digite um valor entre 0 e 100.")
+    desconto = float(input("Digite o percentual de desconto (ex: 10 para 10%): "))
+
+empresa_idx = {'A': 2, 'B': 3, 'C': 4}[empresa_escolhida]
+fator_desconto = 1 - (desconto / 100)
+
+produtos_com_desconto = list(map(lambda p: [
+    p[0],  # Nome
+    p[1],  # Categoria
+    round(p[2] * (fator_desconto if empresa_idx == 2 else 1), 2),  # Empresa A com desconto se aplicável
+    round(p[3] * (fator_desconto if empresa_idx == 3 else 1), 2),  # Empresa B com desconto se aplicável
+    round(p[4] * (fator_desconto if empresa_idx == 4 else 1), 2)   # Empresa C com desconto se aplicável
+], produtos))
+
+resultados = list(map(lambda p: [
+    p[0],  # Nome
+    p[1],  # Categoria
+    min(p[2], p[3], p[4]),  # Menor preço
+    ['Empresa A', 'Empresa B', 'Empresa C'][[p[2], p[3], p[4]].index(min(p[2], p[3], p[4]))]  # Empresa com menor preço
+], produtos_com_desconto))
+
+with open('RESULTADO_LICITACAO.CSV', mode='w', encoding='utf-8', newline='') as file:
+    writer = csv.writer(file, delimiter=';')
+    writer.writerow(['Nome', 'Categoria', 'Menor Preço', 'Empresa Vencedora'])
+    writer.writerows(resultados)
+
+print("Processamento concluído. Resultados salvos em RESULTADO_LICITACAO.CSV")
