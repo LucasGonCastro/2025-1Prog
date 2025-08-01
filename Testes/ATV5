@@ -1,0 +1,23 @@
+
+gabarito = open('gabarito.txt').read().split()
+
+provas = []
+for linha in open('provas.csv'):
+    dados = linha.strip().split(';')
+    respostas = dados[1:]
+    acertos = 0
+    for i in range(10):
+        if respostas[i] == gabarito[i]:
+            acertos += 1
+    dados.append(str(acertos))
+    provas.append(dados)
+
+provas.sort(key=lambda x: int(x[-1]), reverse=True)
+
+with open('RESULTADOS.CSV', 'w') as out:
+    for aluno in provas:
+        out.write(';'.join(aluno) + '\n')
+
+print("Resultados:")
+for i in range(len(provas)):
+    print(provas[i][0], "teve", provas[i][-1], "acertos")
